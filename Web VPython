@@ -1,0 +1,41 @@
+Web VPython 3.2
+
+rate_mult = 1000
+dt = 1
+trace_draw_int=20
+
+sat_start_position = vector(0,7000000,0)
+sat_start_velocity = vector(8000,0,0)
+
+mu = 398600441800000
+g_pow = 2
+planet_radius = 6000000
+initial_height = 1500000
+sat_size = 300000
+scene = canvas(title='Orbit', x=0, y=0, width=600, height=600, background=color.white) 
+planet = sphere(pos=vector(0,0,0), radius=planet_radius, texture=textures.earth)
+satellite = sphere(pos=sat_start_position, radius=sat_size, color=color.green, texture=textures.metal, make_trail=True)
+satellite.velocity = sat_start_velocity 
+trace = curve(color = color.red, width=10)
+zero_meridian=0
+ddd=0
+x=0
+while True:
+    rate(rate_mult/dt)
+    radvec = satellite.pos/satellite.pos.mag
+    g = (mu/(satellite.pos.mag**g_pow))
+    gvec = radvec * g*dt
+    satellite.velocity=satellite.velocity-gvec
+    satellite.pos = satellite.pos + satellite.velocity*dt
+    planet_rot_angle = 2*pi*dt/86400
+    zero_meridian = zero_meridian-planet_rot_angle
+    if (zero_meridian<-pi): zero_meridian = zero_meridian + 2*pi
+    latitude = asin(satellite.pos.y / satellite.pos.mag)
+    
+    longitude = atan2(satellite.pos.x, satellite.pos.z) + zero_meridian
+    if longitude<-pi: 
+        longitude = longitude + 2*pi
+    if longitude>pi: 
+        longitude = longitude - 2*pi
+        
+    planet.rotate(angle=planet_rot_angle, axis=vector(0,1,0))
